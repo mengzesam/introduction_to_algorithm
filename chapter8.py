@@ -16,7 +16,7 @@ class COUNTINGSORT:
             C[i]+=C[i-1]
         #C[i] now contains the number of elements less than or equal to i
         for j in range(n-1,-1,-1):
-            B[C[A[j]-1]]=A[j]
+            B[C[A[j]]-1]=A[j]
             C[A[j]]-=1 #A[j] might not be distinct, Decrementing C[A[j]] for the next the element
                     #equal to A[j], if one exists, put it immediately before A[j] in the output array.
 
