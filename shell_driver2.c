@@ -18,6 +18,12 @@ typedef long itemType;
 
 #define IENN 8
 
+int less2(const void* a,const void* b){
+  return ( *(int*)a - *(int*)b );
+}
+void call_qsort(itemType a[], int l, int r){
+    qsort(&a[l],r-l+1,sizeof(itemType),less2);
+}
 void showItem(itemType x)
   { printf("%11ld ", x); }  
 void showArray(itemType a[], int l, int r)
@@ -134,8 +140,8 @@ long doit(void (*sortprog)(), itemType a[], int l, int r)
     (*sortprog)(a, l, r);
     clock_t end=times(&t_end);
     long tps=sysconf(_SC_CLK_TCK);
-    //for (i = l; i < r; i++)  //checking if it is sorted
-    //  if (less(a[i+1], a[i])) return -1;
+    for (i = l; i < r; i++)  //checking if it is sorted
+      if (less(a[i+1], a[i])) return -1;
     //return (end-start)*1000/tps;
     return (t_end.tms_utime-t_start.tms_utime+t_end.tms_stime-t_start.tms_stime)*1000/tps;
   }
@@ -143,12 +149,12 @@ long doit(void (*sortprog)(), itemType a[], int l, int r)
 int main(int argc, char *argv[])
   { itemType *a, *b;
     int N; int debug = atoi(argv[--argc]);
-    int c1=0, c2=0, c3=0, c4=0, c5=0, c6=0;
+    int c1=0, c2=0, c3=0, c4=0, c5=0, c6=0,c7=0;
 
     a =(itemType*)malloc(maxN*sizeof(itemType));
     b =(itemType*)malloc(maxN*sizeof(itemType));
 
-    printf("         N          O          K          G          S          P          I        \n");
+    printf("         N          O          K          G          S          P          I          qsort          \n");
     for (N = 12500; N <= maxN; N *= 2)
       {
         randArray(b, N);
@@ -162,9 +168,9 @@ int main(int argc, char *argv[])
         // copyArray(a, b, N); c4 = doit(shellsortSe, a, 0, N-1);
         // copyArray(a, b, N); c5 = doit(shellsortPr, a, 0, N-1);
         copyArray(a, b, N); c6 = doit(shellsortIS, a, 0, N-1);
-        printf("%10d %10d %10d %10d %10d %10d %10d\n", N, c1, c2, c3, c4, c5, c6);
+        copyArray(a, b, N); c7 = doit(call_qsort, a, 0, N-1);
+        printf("%10d %10d %10d %10d %10d %10d %10d %10d\n", N, c1, c2, c3, c4, c5, c6,c7);
       }
-
     printf("\n");
     printf("           O:  Shell's original\n");
     printf("           K:  Knuth\n");
