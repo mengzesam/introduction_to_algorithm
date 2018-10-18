@@ -21,8 +21,11 @@ void shellSort(itemType A[],int l,int r);
 void shellSortIS(itemType a[], int l, int r);
 void insertSort(itemType a[],int l,int r);
 void maxHeapify(itemType A[],int l,int r,int i);
+void recursiveMaxHeapify(itemType A[],int l,int r,int i);
 void buildMaxHeap(itemType A[],int l,int r);
 void heapSort(itemType A[],int l,int r);
+void recursiveBuildMaxHeap(itemType A[],int l,int r);
+void recursiveHeapSort(itemType A[],int l,int r);
 /**************/
 long doit(void (*sortprog)(), itemType a[], int l, int r){
     int i; long t;
@@ -48,21 +51,22 @@ int main(){
 
     a =(itemType*)malloc(maxN*sizeof(itemType));
     b =(itemType*)malloc(maxN*sizeof(itemType));
-    printf("         N        insert     heap        shell       shellIS  hybridquick  quick        qsort          \n");
+    printf("         N        heap   recheap        shell       shellIS  hybridquick  quick        qsort          \n");
     //printf("         N          1          2          3          4         5          6            7            \n");
     for (N = 10000; N <= maxN; N *= 2)
       {
         randArray(b, N);
-        if(N<=80000)
-            {copyArray(a, b, N); c1 = doit(insertSort, a, 0, N-1);}
-        else
-            c1=0;
-        copyArray(a, b, N); c2 = doit(heapSort, a, 0, N-1);
-        copyArray(a, b, N); c3 = doit(shellSort, a, 0, N-1);
-        copyArray(a, b, N); c4 = doit(shellSortIS, a, 0, N-1);
+        // if(N<=80000)
+        //     {copyArray(a, b, N); c1 = doit(insertSort, a, 0, N-1);}
+        // else
+        //     c1=0;
+        copyArray(a, b, N); c1 = doit(heapSort, a, 0, N-1);
+        copyArray(a, b, N); c2 = doit(recursiveHeapSort, a, 0, N-1);
+        // copyArray(a, b, N); c3 = doit(shellSort, a, 0, N-1);
+        // copyArray(a, b, N); c4 = doit(shellSortIS, a, 0, N-1);
         copyArray(a, b, N); c5 = doit(hybridQuickSort, a, 0, N-1);
-        copyArray(a, b, N); c6 = doit(quickSort, a, 0, N-1);
-        copyArray(a, b, N); c7 = doit(call_qsort, a, 0, N-1);
+        // copyArray(a, b, N); c6 = doit(quickSort, a, 0, N-1);
+        // copyArray(a, b, N); c7 = doit(call_qsort, a, 0, N-1);
         printf("%10d %10d %10d %10d %10d %10d %10d %10d\n", N, c1, c2, c3, c4, c5, c6,c7);
       }
     return 0;
@@ -228,6 +232,26 @@ void maxHeapify(itemType A[],int l,int r,int i){
             largest=left;
     }
 }
+void recursiveMaxHeapify(itemType A[],int l,int r,int i){
+    /*
+        shiftDown
+    */
+    if(i<l || i>r) return;
+    int root=i;
+    int largest=root;
+    int left=root-l+root+1;
+    int right=root-l+root+2;
+    if(right<=r && cmp(A[root],A[right]))
+        largest=right;
+    if(left<=r && cmp(A[largest],A[left]))
+        largest=left;
+    if(largest!=root){
+        itemType tmp=A[root];
+        A[root]=A[largest];
+        A[largest]=tmp;
+        recursiveMaxHeapify(A,l,r,largest);
+    }
+}
 void buildMaxHeap(itemType A[],int l,int r){
     for(int i=l-1+(r-l+1)/2;i>=l;i--)
         maxHeapify(A,l,r,i);
@@ -242,5 +266,21 @@ void heapSort(itemType A[],int l,int r){
         A[l]=tmp;
         end--;
         maxHeapify(A,l,end,l);
+    }
+}
+void recursiveBuildMaxHeap(itemType A[],int l,int r){
+    for(int i=l-1+(r-l+1)/2;i>=l;i--)
+        recursiveMaxHeapify(A,l,r,i);
+}
+void recursiveHeapSort(itemType A[],int l,int r){
+    if(l==r) return;
+    recursiveBuildMaxHeap(A,l,r);
+    int end=r;
+    while(end>l){
+        itemType tmp=A[end];
+        A[end]=A[l];
+        A[l]=tmp;
+        end--;
+        recursiveMaxHeapify(A,l,end,l);
     }
 }
